@@ -1,10 +1,9 @@
-# encoding: shift_jis
 import numpy
 import random
 import math
 import pylab
 
-# ƒnƒCƒp[ƒpƒ‰ƒ[ƒ^
+# ÂƒnÂƒCÂƒpÂ[ÂƒpÂƒÂ‰ÂƒÂÂ[Âƒ^
 __alpha = 1.0
 __beta = 1.0
 
@@ -12,16 +11,16 @@ __beta = 1.0
 def calc_lda_param( docs_dn, topics_dn, K, V ):
     D = len(docs_dn)
 
-    n_dz = numpy.zeros((D,K))   # Še•¶‘d‚É‚¨‚¢‚ÄƒgƒsƒbƒNz‚ª”­¶‚µ‚½‰ñ”
-    n_zv = numpy.zeros((K,V))   # ŠeƒgƒsƒbƒNz‚É‚Ò‚¨‚¢‚Ä’PŒêv‚ª”­¶‚µ‚½‰ñ”
-    n_z = numpy.zeros(K)        # ŠeƒgƒsƒbƒN‚ª”­¶‚µ‚½‰ñ”
+    n_dz = numpy.zeros((D,K))   # ÂŠeÂ•Â¶ÂÂ‘dÂ‚Ã‰Â‚Â¨Â‚Â¢Â‚Ã„ÂƒgÂƒsÂƒbÂƒNzÂ‚ÂªÂ”Â­ÂÂ¶Â‚ÂµÂ‚Â½Â‰Ã±ÂÂ”
+    n_zv = numpy.zeros((K,V))   # ÂŠeÂƒgÂƒsÂƒbÂƒNzÂ‚Ã‰Â‚Ã’Â‚Â¨Â‚Â¢Â‚Ã„Â’PÂŒÃªvÂ‚ÂªÂ”Â­ÂÂ¶Â‚ÂµÂ‚Â½Â‰Ã±ÂÂ”
+    n_z = numpy.zeros(K)        # ÂŠeÂƒgÂƒsÂƒbÂƒNÂ‚ÂªÂ”Â­ÂÂ¶Â‚ÂµÂ‚Â½Â‰Ã±ÂÂ”
 
-    # ”‚¦ã‚°‚é
+    # ÂÂ”Â‚Â¦ÂÃ£Â‚Â°Â‚Ã©
     for d in range(D):
-        N = len(docs_dn[d])    # •¶‘‚ÉŠÜ‚Ü‚ê‚é’PŒê”
+        N = len(docs_dn[d])    # Â•Â¶ÂÂ‘Â‚Ã‰ÂŠÃœÂ‚ÃœÂ‚ÃªÂ‚Ã©Â’PÂŒÃªÂÂ”
         for n in range(N):
-            v = docs_dn[d][n]  # ƒhƒLƒ…ƒƒ“ƒgd‚Ìn”Ô–Ú‚Ì’PŒê‚ÌƒCƒ“ƒfƒbƒNƒX
-            z = topics_dn[d][n]     # ’PŒê‚ÉŠ„‚è“–‚Ä‚ê‚ê‚Ä‚¢‚éƒgƒsƒbƒN
+            v = docs_dn[d][n]  # ÂƒhÂƒ
+            z = topics_dn[d][n]     # Â’PÂŒÃªÂ‚Ã‰ÂŠÂ„Â‚Ã¨Â“Â–Â‚Ã„Â‚ÃªÂ‚ÃªÂ‚Ã„Â‚Â¢Â‚Ã©ÂƒgÂƒsÂƒbÂƒN
             n_dz[d][z] += 1
             n_zv[z][v] += 1
             n_z[z] += 1
@@ -32,12 +31,12 @@ def calc_lda_param( docs_dn, topics_dn, K, V ):
 def sample_topic( d, v, n_dz, n_zv, n_z, K, V ):
     P = [ 0.0 ] * K
 
-    # —İÏŠm—¦‚ğŒvZ
+    # Â—ÃÂÃÂŠmÂ—Â¦Â‚Ã°ÂŒvÂZ
     P = (n_dz[d,:] + __alpha )*(n_zv[:,v] + __beta) / (n_z[:] + V *__beta)
     for z in range(1,K):
         P[z] = P[z] + P[z-1]
 
-    # ƒTƒ“ƒvƒŠƒ“ƒO
+    # ÂƒTÂƒÂ“ÂƒvÂƒÂŠÂƒÂ“ÂƒO
     rnd = P[K-1] * random.random()
     for z in range(K):
         if P[z] >= rnd:
@@ -45,20 +44,20 @@ def sample_topic( d, v, n_dz, n_zv, n_z, K, V ):
 
 
 
-# ’PŒê‚ğˆê—ñ‚É•À‚×‚½ƒŠƒXƒg•ÏŠ·
+# Â’PÂŒÃªÂ‚Ã°ÂˆÃªÂ—Ã±Â‚Ã‰Â•Ã€Â‚Ã—Â‚Â½ÂƒÂŠÂƒXÂƒgÂ•ÃÂŠÂ·
 def conv_to_word_list( data ):
     V = len(data)
     doc = []
-    for v in range(V):  # v:Œêœb‚ÌƒCƒ“ƒfƒbƒNƒX
-        for n in range(data[v]): # Œêœb‚Ì”­¶‚µ‚½‰ñ”•¶for‚ğ‰ñ‚·
+    for v in range(V):  # v:ÂŒÃªÂœbÂ‚ÃŒÂƒCÂƒÂ“ÂƒfÂƒbÂƒNÂƒX
+        for n in range(data[v]): # ÂŒÃªÂœbÂ‚ÃŒÂ”Â­ÂÂ¶Â‚ÂµÂ‚Â½Â‰Ã±ÂÂ”Â•Â¶forÂ‚Ã°Â‰Ã±Â‚Â·
             doc.append(v)
     return doc
 
-# –Ş“xŒvZ
+# Â–ÃÂ“xÂŒvÂZ
 def calc_liklihood( data, n_dz, n_zv, n_z, K, V  ):
     lik = 0
 
-    # ã‚Ìˆ—‚ğ‚‘¬‰»
+    # ÂÃ£Â‚ÃŒÂÂˆÂ—ÂÂ‚Ã°ÂÂ‚Â‘Â¬Â‰Â»
     P_vz = (n_zv.T + __beta) / (n_z + V *__beta)
     for d in range(len(data)):
         Pz = (n_dz[d] + __alpha )/( numpy.sum(n_dz[d]) + K *__alpha )
@@ -79,45 +78,45 @@ def save_model( n_dz, n_zv, n_z ):
     numpy.savetxt( "Pzv.txt", Pzv, fmt=str("%f") )
 
 
-# ldaƒƒCƒ“
+# ldaÂƒÂÂƒCÂƒÂ“
 def lda( data , K ):
     pylab.ion()
-    # –Ş“x‚ÌƒŠƒXƒg
+    # Â–ÃÂ“xÂ‚ÃŒÂƒÂŠÂƒXÂƒg
     liks = []
 
-    # ’PŒê‚Ìí—Ş”
-    V = len(data[0])    # Œêœb”
-    D = len(data)       # •¶‘”
+    # Â’PÂŒÃªÂ‚ÃŒÂÃ­Â—ÃÂÂ”
+    V = len(data[0])    # ÂŒÃªÂœbÂÂ”
+    D = len(data)       # Â•Â¶ÂÂ‘ÂÂ”
 
-    # data“à‚Ì’PŒê‚ğˆê—ñ‚É•À‚×‚éiŒvZ‚µ‚â‚·‚­‚·‚é‚½‚ßj
+    # dataÂ“Ã Â‚ÃŒÂ’PÂŒÃªÂ‚Ã°ÂˆÃªÂ—Ã±Â‚Ã‰Â•Ã€Â‚Ã—Â‚Ã©ÂiÂŒvÂZÂ‚ÂµÂ‚Ã¢Â‚Â·Â‚Â­Â‚Â·Â‚Ã©Â‚Â½Â‚ÃŸÂj
     docs_dn = [ None for i in range(D) ]
     topics_dn = [ None for i in range(D) ]
     for d in range(D):
         docs_dn[d] = conv_to_word_list( data[d] )
-        topics_dn[d] = numpy.random.randint( 0, K, len(docs_dn[d]) ) # Še’PŒê‚Éƒ‰ƒ“ƒ_ƒ€‚ÅƒgƒsƒbƒN‚ğŠ„‚è“–‚Ä‚é
+        topics_dn[d] = numpy.random.randint( 0, K, len(docs_dn[d]) ) # ÂŠeÂ’PÂŒÃªÂ‚Ã‰ÂƒÂ‰ÂƒÂ“Âƒ_ÂƒÂ€Â‚Ã…ÂƒgÂƒsÂƒbÂƒNÂ‚Ã°ÂŠÂ„Â‚Ã¨Â“Â–Â‚Ã„Â‚Ã©
 
-    # LDA‚Ìƒpƒ‰ƒ[ƒ^‚ğŒvZ
+    # LDAÂ‚ÃŒÂƒpÂƒÂ‰ÂƒÂÂ[Âƒ^Â‚Ã°ÂŒvÂZ
     n_dz, n_zv, n_z = calc_lda_param( docs_dn, topics_dn, K, V )
 
 
     for it in range(20):
-        # ƒƒCƒ“‚Ìˆ—
+        # ÂƒÂÂƒCÂƒÂ“Â‚ÃŒÂÂˆÂ—Â
         for d in range(D):
-            N = len(docs_dn[d]) # •¶‘d‚ÉŠÜ‚Ü‚ê‚é’PŒê”
+            N = len(docs_dn[d]) # Â•Â¶ÂÂ‘dÂ‚Ã‰ÂŠÃœÂ‚ÃœÂ‚ÃªÂ‚Ã©Â’PÂŒÃªÂÂ”
             for n in range(N):
-                v = docs_dn[d][n]       # ’PŒê‚ÌƒCƒ“ƒfƒbƒNƒX
-                z = topics_dn[d][n]     # ’PŒê‚ÉŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚éƒgƒsƒbƒN
+                v = docs_dn[d][n]       # Â’PÂŒÃªÂ‚ÃŒÂƒCÂƒÂ“ÂƒfÂƒbÂƒNÂƒX
+                z = topics_dn[d][n]     # Â’PÂŒÃªÂ‚Ã‰ÂŠÂ„Â‚Ã¨Â“Â–Â‚Ã„Â‚Ã§Â‚ÃªÂ‚Ã„Â‚Â¢Â‚Ã©ÂƒgÂƒsÂƒbÂƒN
 
 
-                # ƒf[ƒ^‚ğæ‚èœ‚«ƒpƒ‰ƒ[ƒ^‚ğXV
+                # ÂƒfÂ[Âƒ^Â‚Ã°ÂÃ¦Â‚Ã¨ÂÂœÂ‚Â«ÂƒpÂƒÂ‰ÂƒÂÂ[Âƒ^Â‚Ã°ÂXÂV
                 n_dz[d][z] -= 1
                 n_zv[z][v] -= 1
                 n_z[z] -= 1
 
-                # ƒTƒ“ƒvƒŠƒ“ƒO
+                # ÂƒTÂƒÂ“ÂƒvÂƒÂŠÂƒÂ“ÂƒO
                 z = sample_topic( d, v, n_dz, n_zv, n_z, K, V )
 
-                # ƒf[ƒ^‚ğƒTƒ“ƒvƒŠƒ“ƒO‚³‚ê‚½ƒNƒ‰ƒX‚É’Ç‰Á‚µ‚Äƒpƒ‰ƒ[ƒ^‚ğXV
+                # ÂƒfÂ[Âƒ^Â‚Ã°ÂƒTÂƒÂ“ÂƒvÂƒÂŠÂƒÂ“ÂƒOÂ‚Â³Â‚ÃªÂ‚Â½ÂƒNÂƒÂ‰ÂƒXÂ‚Ã‰Â’Ã‡Â‰ÃÂ‚ÂµÂ‚Ã„ÂƒpÂƒÂ‰ÂƒÂÂ[Âƒ^Â‚Ã°ÂXÂV
                 topics_dn[d][n] = z
                 n_dz[d][z] += 1
                 n_zv[z][v] += 1
@@ -125,13 +124,13 @@ def lda( data , K ):
 
         lik = calc_liklihood( data, n_dz, n_zv, n_z, K, V )
         liks.append( lik )
-        print "‘Î”–Ş“xF", lik
+        print ("å¯¾æ•°å°¤åº¦"), lik
         doc_dopics = numpy.argmax( n_dz , 1 )
-        print "•ª—ŞŒ‹‰ÊF", doc_dopics
-        print "---------------------"
+        print ("åˆ†é¡çµæœ"), doc_dopics
+        print ("---------------------")
 
 
-        # ƒOƒ‰ƒt•\¦
+        # ÂƒOÂƒÂ‰ÂƒtÂ•\ÂÂ¦
         pylab.clf()
         pylab.subplot("121")
         pylab.title( "P(z|d)" )
